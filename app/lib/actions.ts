@@ -122,3 +122,17 @@ export async function authenticate(
     throw error;
   }
 }
+export async function deleteInvoice(id: string) {
+  try {
+    await sql`
+      DELETE FROM invoices
+      WHERE id = ${id}
+    `;
+  } catch (error) {
+    // log the error but return nothing
+    console.error('Database Error: Failed to Delete Invoice.', error);
+    return;
+  }
+
+  revalidatePath('/dashboard/invoices');
+}
