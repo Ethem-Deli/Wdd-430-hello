@@ -18,11 +18,15 @@ export default function EditInvoiceForm({
   invoice: InvoiceForm;
   customers: CustomerField[];
 }) {
-  const updateInvoiceWithId = updateInvoice.bind(null, invoice.id);
+  // CHANGE: Wrapped server action so it returns void (React requirement)
+  const updateInvoiceWithId = async (formData: FormData) => {
+    await updateInvoice(invoice.id, formData);
+  };
 
   return (
     <form action={updateInvoiceWithId}>
       <div className="rounded-md bg-gray-50 p-4 md:p-6">
+
         {/* Customer Name */}
         <div className="mb-4">
           <label htmlFor="customer" className="mb-2 block text-sm font-medium">
@@ -75,6 +79,7 @@ export default function EditInvoiceForm({
           </legend>
           <div className="rounded-md border border-gray-200 bg-white px-[14px] py-3">
             <div className="flex gap-4">
+
               {/* Pending */}
               <div className="flex items-center">
                 <input
@@ -110,9 +115,11 @@ export default function EditInvoiceForm({
                   Paid <CheckIcon className="h-4 w-4" />
                 </label>
               </div>
+
             </div>
           </div>
         </fieldset>
+
       </div>
 
       <div className="mt-6 flex justify-end gap-4">
