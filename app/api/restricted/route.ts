@@ -1,7 +1,8 @@
-import { auth } from "../auth/[...nextauth]/route";
+import getServerSession from "next-auth";
+import { authConfig } from "../auth/auth.config";
 
-export async function GET(req: Request) {
-  const session = await auth();
+export async function GET() {
+  const session = await getServerSession(authConfig);
 
   if (session) {
     return new Response(
