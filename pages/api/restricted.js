@@ -1,17 +1,16 @@
 import { getServerSession } from "next-auth/next"
-// import { authOptions } from "./auth/[...nextauth]"
+import { auth } from "@/app/api/auth/[...nextauth]/route";
 
-export default async (req, res) => {
-  const session = await getServerSession(req, res, authOptions)
+export default async function handler(req, res) {
+  const session = await auth();
 
   if (session) {
-    res.send({
-      content:
-        "This is protected content. You can access this content because you are signed in.",
-    })
+    res.status(200).json({
+      content: "You are signed in. Protected content.",
+    });
   } else {
-    res.send({
-      error: "You must be signed in to view the protected content on this page.",
-    })
+    res.status(401).json({
+      error: "You must be signed in to view this content.",
+    });
   }
 }
