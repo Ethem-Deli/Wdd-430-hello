@@ -6,6 +6,9 @@ import type { User } from "@/app/lib/definitions";
 import bcrypt from "bcrypt";
 import postgres from "postgres";
 
+import type { Session } from "next-auth";
+import type { JWT } from "next-auth/jwt";
+
 const sql = postgres(process.env.POSTGRES_URL!, {
   ssl: { rejectUnauthorized: false },
 });
@@ -17,14 +20,13 @@ async function getUser(email: string): Promise<User | undefined> {
   return result[0];
 }
 
-export default NextAuth({
+const config = {
   ...authConfig,
-  secret: process.env.AUTH_SECRET,
   providers: [
     Credentials({
       async authorize(credentials) {
         const parsed = z
-          .object({ email: z.string().email(), password: z.string().min(6) })
+          .object({ email: z.string().email(), password: z.string() })
           .safeParse(credentials);
 
         if (!parsed.success) return null;
@@ -40,11 +42,27 @@ export default NextAuth({
       },
     }),
   ],
+
   callbacks: {
-    async session({ session, token }) {
+    async session(
+      { session, token }: { session: Session; token: JWT }
+    ) {
+      // Guarantee session.user exists
+      session.user ??= {} as any;
+
       if (token?.id) session.user.id = token.id as string;
-      session.user.email = token.email as string;
+      if (token?.email) session.user.email = token.email as string;
+      if (token?.name) session.user.name = token.name as string;
+
       return session;
     },
   },
-});
+};
+
+// ⭐ Correct NextAuth export for App Router
+export const {
+  handlers: { GET, POST },
+  auth,
+  signIn,
+  signOut,
+} = NextAuth(config);
