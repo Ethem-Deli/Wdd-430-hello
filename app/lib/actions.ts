@@ -4,8 +4,7 @@ import { z } from 'zod';
 import { revalidatePath } from 'next/cache';
 import { redirect } from 'next/navigation';
 import postgres from 'postgres';
-import { signIn } from '@/app/api/auth/[...nextauth]/route';
-import { AuthError } from 'next-auth';
+import { signIn } from '@/app/lib/auth';
 
 const sql = postgres(process.env.POSTGRES_URL!, { ssl: 'require' });
 
@@ -104,35 +103,43 @@ export async function updateInvoice(
   revalidatePath('/dashboard/invoices');
   redirect('/dashboard/invoices');
 }
+
 export async function authenticate(
   prevState: string | undefined,
   formData: FormData,
 ) {
   try {
-    await signIn('credentials', formData);
+    await signIn('credentials', {
+      email: formData.get('email') as string,
+      password: formData.get('password') as string,
+      redirect: false,
+    });
   } catch (error) {
-    if (error instanceof AuthError) {
-      switch (error.type) {
-        case 'CredentialsSignin':
-          return 'Invalid credentials.';
-        default:
-          return 'Something went wrong.';
+    // Handle authentication errors
+    if (error instanceof Error) {
+      // Check for specific error messages from NextAuth
+      if (error.message.includes('CredentialsSignin') || error.message.includes('authorize')) {
+        return 'Invalid credentials.';
       }
+      return 'Something went wrong.';
     }
     throw error;
   }
+
+  redirect('/dashboard');
 }
-export async function deleteInvoice(id: string) {
+
+export async function deleteInvoice(id: string): Promise<void> {
   try {
     await sql`
       DELETE FROM invoices
       WHERE id = ${id}
     `;
+    revalidatePath('/dashboard/invoices');
+    // Don't return anything (void)
   } catch (error) {
-    // log the error but return nothing
     console.error('Database Error: Failed to Delete Invoice.', error);
-    return;
+    // You can throw an error or handle it silently
+    throw new Error('Failed to delete invoice.');
   }
-
-  revalidatePath('/dashboard/invoices');
 }

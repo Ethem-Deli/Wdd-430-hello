@@ -1,33 +1,34 @@
 // app/lib/auth.ts
 import NextAuth from "next-auth";
 import Credentials from "next-auth/providers/credentials";
+import GithubProvider from "next-auth/providers/github";
 import postgres from "postgres";
 import bcrypt from "bcrypt";
 import { z } from "zod";
 import type { User } from "@/app/lib/definitions";
-import GithubProvider from "next-auth/providers/github";
 
-export const authOptions = {
-  providers: [
-    GithubProvider({
-      clientId: process.env.GITHUB_ID!,
-      clientSecret: process.env.GITHUB_SECRET!,
-    }),
-  ],
-};
 const sql = postgres(process.env.POSTGRES_URL!, {
   ssl: { rejectUnauthorized: false },
 });
 
 async function getUser(email: string): Promise<User | undefined> {
-  const result = await sql<User[]>`
-    SELECT * FROM users WHERE email = ${email}
-  `;
-  return result[0];
+  try {
+    const result = await sql<User[]>`
+      SELECT * FROM users WHERE email = ${email}
+    `;
+    return result[0];
+  } catch (error) {
+    console.error('Failed to fetch user:', error);
+    return undefined;
+  }
 }
 
 export const { handlers, auth, signIn, signOut } = NextAuth({
   providers: [
+    GithubProvider({
+      clientId: process.env.GITHUB_ID!,
+      clientSecret: process.env.GITHUB_SECRET!,
+    }),
     Credentials({
       async authorize(credentials) {
         const parsed = z.object({
