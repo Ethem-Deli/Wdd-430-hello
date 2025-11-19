@@ -1,13 +1,11 @@
 // app/dashboard/page.tsx
-import { getServerSession } from "next-auth";
-import { authOptions } from "@/lib/auth";
+import { auth } from "@/app/lib/auth";
 import { redirect } from "next/navigation";
 
 export default async function DashboardPage() {
-  const session = await getServerSession(authOptions);
+  const session = await auth();
 
   if (!session) {
-    // not logged in, redirect to sign-in
     redirect("/auth/signin");
   }
 

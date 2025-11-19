@@ -1,12 +1,22 @@
 // app/lib/auth.ts
+import NextAuth from "next-auth";
 import Credentials from "next-auth/providers/credentials";
 import postgres from "postgres";
 import bcrypt from "bcrypt";
 import { z } from "zod";
 import type { User } from "@/app/lib/definitions";
+import GithubProvider from "next-auth/providers/github";
 
+export const authOptions = {
+  providers: [
+    GithubProvider({
+      clientId: process.env.GITHUB_ID!,
+      clientSecret: process.env.GITHUB_SECRET!,
+    }),
+  ],
+};
 const sql = postgres(process.env.POSTGRES_URL!, {
-  ssl: { rejectUnauthorized: false }
+  ssl: { rejectUnauthorized: false },
 });
 
 async function getUser(email: string): Promise<User | undefined> {
@@ -16,7 +26,7 @@ async function getUser(email: string): Promise<User | undefined> {
   return result[0];
 }
 
-export const authOptions = {
+export const { handlers, auth, signIn, signOut } = NextAuth({
   providers: [
     Credentials({
       async authorize(credentials) {
@@ -31,26 +41,22 @@ export const authOptions = {
         const user = await getUser(email);
         if (!user) return null;
 
-        const ok = await bcrypt.compare(password, user.password);
-        if (!ok) return null;
+        const match = await bcrypt.compare(password, user.password);
+        if (!match) return null;
 
         return {
           id: user.id,
+          name: user.name,
           email: user.email,
-          name: user.name
         };
       }
     })
   ],
-
-  callbacks: {
-    async redirect({ url, baseUrl }) {
-      if (url.startsWith("/")) return `${baseUrl}${url}`;
-      return `${baseUrl}/dashboard`;
-    }
+  
+  pages: {
+    signIn: "/auth/signin",
   },
 
   session: { strategy: "jwt" },
-  pages: { signIn: "/auth/signin" },
-  secret: process.env.NEXTAUTH_SECRET
-};
+  secret: process.env.NEXTAUTH_SECRET,
+});
