@@ -5,19 +5,19 @@ export const authConfig: NextAuthConfig = {
     signIn: "/login",
   },
 
-  // Required by NextAuthConfig type
-  providers: [], 
+  providers: [],
 
   callbacks: {
     authorized({ auth, request: { nextUrl } }) {
       const isLoggedIn = !!auth?.user;
       const isOnDashboard = nextUrl.pathname.startsWith("/dashboard");
 
+      // Block dashboard if not logged in
       if (isOnDashboard) {
-        if (isLoggedIn) return true;
-        return false;
+        return isLoggedIn;
       }
 
+      // Redirect logged-in user away from the login page
       if (isLoggedIn && nextUrl.pathname === "/login") {
         return Response.redirect(new URL("/dashboard", nextUrl));
       }

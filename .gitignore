@@ -35,3 +35,5 @@ yarn-error.log*
 *.tsbuildinfo
 next-env.d.ts
 deli.txt
+app.zip
+next.config.js
