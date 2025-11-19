@@ -18,7 +18,7 @@ async function getUser(email: string): Promise<User | undefined> {
     `;
     return result[0];
   } catch (error) {
-    console.error('Failed to fetch user:', error);
+    console.error("Failed to fetch user:", error);
     return undefined;
   }
 }
@@ -29,16 +29,20 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
       clientId: process.env.GITHUB_ID!,
       clientSecret: process.env.GITHUB_SECRET!,
     }),
+
     Credentials({
       async authorize(credentials) {
-        const parsed = z.object({
-          email: z.string().email(),
-          password: z.string()
-        }).safeParse(credentials);
+        const parsed = z
+          .object({
+            email: z.string().email(),
+            password: z.string(),
+          })
+          .safeParse(credentials);
 
         if (!parsed.success) return null;
 
         const { email, password } = parsed.data;
+
         const user = await getUser(email);
         if (!user) return null;
 
@@ -50,14 +54,31 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
           name: user.name,
           email: user.email,
         };
-      }
-    })
+      },
+    }),
   ],
-  
+
   pages: {
     signIn: "/auth/signin",
   },
 
   session: { strategy: "jwt" },
   secret: process.env.NEXTAUTH_SECRET,
+
+  // 🚀 THIS FIXES YOUR LOGIN PROBLEM
+  callbacks: {
+    async jwt({ token, user }) {
+      if (user) {
+        token.user = user; // store user inside JWT
+      }
+      return token;
+    },
+
+    async session({ session, token }) {
+      if (token.user) {
+        session.user = token.user as any; // pass stored user to session
+      }
+      return session;
+    },
+  },
 });

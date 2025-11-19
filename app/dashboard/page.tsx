@@ -1,6 +1,8 @@
-// app/dashboard/page.tsx
-import { auth } from "@/app/lib/auth";
-import { redirect } from "next/navigation";
+"use client";
+
+import { useEffect } from "react";
+import { useRouter } from "next/navigation";
+import { useSession } from "next-auth/react";
 import {
   BarChart,
   Bar,
@@ -10,16 +12,28 @@ import {
   ResponsiveContainer,
 } from "recharts";
 
-export const dynamic = "force-dynamic";
+export default function DashboardPage() {
+  const { data: session, status } = useSession();
+  const router = useRouter();
 
-export default async function DashboardPage() {
-  const session = await auth();
+  // Redirect to login if not authenticated
+  useEffect(() => {
+    if (status === "unauthenticated") {
+      router.push("/auth/signin");
+    }
+  }, [status, router]);
 
-  if (!session) {
-    redirect("/auth/signin");
+  if (status === "loading") {
+    return (
+      <div className="p-8">
+        <p>Loading dashboard...</p>
+      </div>
+    );
   }
 
-  // ---- Dashboard Data (replace with DB data later if needed) ----
+  if (!session) return null;
+
+  // Dashboard Data
   const summaryCards = [
     { label: "Collected", value: "$7,498.25" },
     { label: "Pending", value: "$2,350.90" },
