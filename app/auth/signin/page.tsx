@@ -12,7 +12,6 @@ export default function SignInPage() {
 
   const [error, setError] = useState<string>("");
 
-  // Redirect if already logged in
   useEffect(() => {
     if (status === "authenticated") {
       router.push(callbackUrl);
@@ -21,30 +20,21 @@ export default function SignInPage() {
 
   async function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
-
     const target = e.target as typeof e.target & {
       email: { value: string };
       password: { value: string };
     };
 
-    const email = target.email.value;
-    const password = target.password.value;
-
-    // ✅ Redirect automatically, no need to check result
     await signIn("credentials", {
       redirect: true,
-      email,
-      password,
+      email: target.email.value,
+      password: target.password.value,
       callbackUrl,
     });
   }
 
   if (status === "loading") {
-    return (
-      <div className="p-8">
-        <p>Loading...</p>
-      </div>
-    );
+    return <p className="p-8">Loading...</p>;
   }
 
   return (
@@ -54,7 +44,6 @@ export default function SignInPage() {
         className="bg-white p-8 rounded shadow-md w-full max-w-md"
       >
         <h1 className="text-2xl font-bold mb-4">Sign In</h1>
-
         <input
           name="email"
           type="email"
@@ -69,14 +58,12 @@ export default function SignInPage() {
           className="border p-2 w-full mb-4 rounded"
           required
         />
-
         <button
           type="submit"
           className="w-full bg-blue-600 text-white py-2 rounded hover:bg-blue-700 transition"
         >
           Sign In
         </button>
-
         {error && <p className="text-red-500 mt-2">{error}</p>}
       </form>
     </div>
