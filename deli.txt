@@ -1,0 +1,74 @@
+D:\wdd430-next-dashboard>npx create-next-app@latest nextjs-dashboard --example "https://github.com/vercel/next-learn/tree/main/dashboard/starter-example" --use-pnpm
+Creating a new Next.js app in D:\wdd430-next-dashboard\nextjs-dashboard.
+
+Downloading files from repo https://github.com/vercel/next-learn/tree/main/dashboard/starter-example. This might take a moment.
+
+Installing packages. This might take a couple of minutes.
+
+Lockfile is up to date, resolution step is skipped
+Packages: +208
+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+Progress: resolved 208, reused 208, downloaded 0, added 208, done
+
+dependencies:
++ @heroicons/react 2.2.0
++ @tailwindcss/forms 0.5.10
++ autoprefixer 10.4.20
++ bcrypt 5.1.1
++ clsx 2.1.1
++ next 15.3.2
++ next-auth 5.0.0-beta.25
++ postcss 8.5.1
++ postgres 3.4.6
++ react 19.1.0
++ react-dom 19.1.0
++ tailwindcss 3.4.17
++ typescript 5.7.3
++ use-debounce 10.0.4
++ zod 3.25.17
+
+devDependencies:
++ @types/bcrypt 5.0.2
++ @types/node 22.10.7
++ @types/react 19.0.7
++ @types/react-dom 19.0.3
+
+Done in 6.1s using pnpm v10.22.0
+
+
+Invalid project directory provided, no such directory: D:\wdd430-next-dashboard\nextjs-dashboard\typegen
+Error running typegen: Error: next typegen exited with code 1
+    at ChildProcess.<anonymous> (C:\Users\ethem\AppData\Local\npm-cache\_npx\cc2145a2fe1558fa\node_modules\create-next-app\dist\index.js:74:206210)
+    at ChildProcess.emit (node:events:508:28)
+    at t.emit (C:\Users\ethem\AppData\Local\npm-cache\_npx\cc2145a2fe1558fa\node_modules\create-next-app\dist\index.js:8:51730)
+    at maybeClose (node:internal/child_process:1101:16)
+    at ChildProcess._handle.onexit (node:internal/child_process:305:5)
+Initialized a git repository.
+
+Success! Created nextjs-dashboard at D:\wdd430-next-dashboard\nextjs-dashboard
+Inside that directory, you can run several commands:
+
+  pnpm run dev
+    Starts the development server.
+
+  pnpm run build
+    Builds the app for production.
+
+  pnpm start
+    Runs the built app in production mode.
+
+We suggest that you begin by typing:
+
+  cd nextjs-dashboard
+  pnpm run dev
+
+
+
+database used is neon 
+https://vercel.com/ethems-projects-72871bea/nextjs-dashboard/integrations/neon/icfg_Wiz9dNssh6DcidDWjZGG9352/resources/storage/store_N0GqCpTKVRrBReJq/guides
+
+vercel app dashboard is
+https://vercel.com/ethems-projects-72871bea/nextjs-dashboard
+
+github 
+https://github.com/Ethem-Deli/nextjs-dashboard.git
